@@ -16,8 +16,8 @@ struct ContentView: View {
                 }
             } else {
                 TodayView(
-                    currentActivity: currentActivity,
-                    timeline: timeline,
+                    currentActivity: $currentActivity,
+                    timeline: $timeline,
                     onSettingsTapped: {
                         showingSettings = true
                     },
@@ -51,8 +51,8 @@ struct ContentView: View {
 
 // MARK: - Today View
 struct TodayView: View {
-    let currentActivity: Activity?
-    let timeline: [Activity]
+    @Binding var currentActivity: Activity?
+    @Binding var timeline: [Activity]
     let onSettingsTapped: () -> Void
     let onQuickStart: (String) -> Void
     let onManualStartTapped: () -> Void
@@ -104,7 +104,20 @@ struct TodayView: View {
                 // Current Activity
                 Group {
                     if let activity = currentActivity {
-                        CurrentActivityCard(activity: activity)
+                        CurrentActivityCard(
+                            activity: activity,
+                            onEnd: {
+                                if let active = currentActivity {
+                                    timeline.append(Activity(
+                                        title: active.title,
+                                        startTime: active.startTime,
+                                        endTime: Date()
+                                    ))
+                                    currentActivity = nil
+                                }
+                            }
+                        )
+
                     } else {
                         NoActivityCard(
                             onStartTapped: onManualStartTapped
@@ -203,3 +216,4 @@ struct SettingsView: View {
         }
     }
 }
+

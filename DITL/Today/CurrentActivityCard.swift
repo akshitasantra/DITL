@@ -1,15 +1,19 @@
 import SwiftUI
+import Combine
 
 struct CurrentActivityCard: View {
     let activity: Activity
-    
+    let onEnd: () -> Void
+
+    @State private var elapsed: TimeInterval = 0
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
     var body: some View {
         ZStack {
-            // Card background + content
             VStack(spacing: 16) {
 
                 // Activity title
-                Text("Homework")
+                Text(activity.title)
                     .font(AppFonts.vt323(24))
                     .foregroundColor(AppColors.pinkPrimary)
                     .multilineTextAlignment(.center)
@@ -22,7 +26,7 @@ struct CurrentActivityCard: View {
 
                 // Elapsed time + video icon
                 HStack(spacing: 8) {
-                    Text("01:35 elapsed")
+                    Text("\(elapsedTimeString(elapsed)) elapsed")
                         .font(AppFonts.vt323(18))
                         .foregroundColor(AppColors.black)
 
@@ -37,7 +41,7 @@ struct CurrentActivityCard: View {
                 .multilineTextAlignment(.center)
 
                 // End Activity Button
-                Button(action: {}) {
+                Button(action: onEnd) {
                     Text("End Activity")
                         .font(AppFonts.rounded(24))
                         .foregroundColor(.white)
@@ -51,7 +55,6 @@ struct CurrentActivityCard: View {
                         .stroke(Color.black, lineWidth: 1)
                 )
                 .shadow(color: Color.black.opacity(0.10), radius: 12, x: 0, y: 4)
-
             }
             .padding(20)
             .frame(maxWidth: .infinity)
@@ -62,6 +65,7 @@ struct CurrentActivityCard: View {
                     .stroke(Color.black, lineWidth: 1)
             )
             .shadow(color: Color.black.opacity(0.10), radius: 12, x: 0, y: 4)
+
             // Decorative icons anchored to card corners
             .overlay(alignment: .topLeading) {
                 Image("love")
@@ -88,14 +92,29 @@ struct CurrentActivityCard: View {
                     .padding(12)
             }
         }
-    }
-    
-    func formattedTime(_ date: Date) -> String {
-            let f = DateFormatter()
-            f.timeStyle = .short
-            return f.string(from: date)
+        .onAppear {
+            elapsed = Date().timeIntervalSince(activity.startTime)
         }
+        .onReceive(timer) { _ in
+            elapsed = Date().timeIntervalSince(activity.startTime)
+        }
+    }
+
+    // MARK: - Helpers
+    private func formattedTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+
+    private func elapsedTimeString(_ time: TimeInterval) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
 }
+
+
 struct NoActivityCard: View {
     let onStartTapped: () -> Void
     
