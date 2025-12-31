@@ -174,19 +174,7 @@ struct TodayView: View {
                     if let activity = currentActivity {
                         CurrentActivityCard(
                             activity: activity,
-                            onEnd: {
-                                let end = Date()
-                                let duration = Int(end.timeIntervalSince(activity.startTime) / 60)
-
-                                DatabaseManager.shared.createActivity(
-                                    title: activity.title,
-                                    start: activity.startTime,
-                                    end: end,
-                                    duration: duration
-                                )
-
-                                reloadToday()
-                            }
+                            onEnd: endCurrentActivity
                         )
                     } else {
                         NoActivityCard(
@@ -211,8 +199,17 @@ struct TodayView: View {
                         .foregroundColor(AppColors.black)
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
+                    
+                    let displayTimeline: [Activity] = {
+                        if let current = currentActivity {
+                            return timeline + [current]
+                        }
+                        else {
+                            return timeline
+                        }
+                    }()
 
-                    if timeline.isEmpty {
+                    if displayTimeline.isEmpty {
                         EmptyTimelineView()
                             .padding(.horizontal, AppLayout.screenPadding)
                     } else {
@@ -251,6 +248,26 @@ struct TodayView: View {
         f.dateFormat = "MM-dd · EEEE · h:mm a"
         return f.string(from: Date())
     }
+    
+    func endCurrentActivity() {
+        guard let activity = currentActivity else { return }
+
+        let end = Date()
+        let duration = Int(end.timeIntervalSince(activity.startTime) / 60)
+
+        DatabaseManager.shared.createActivity(
+                title: activity.title,
+                start: activity.startTime,
+                end: end,
+                duration: duration
+            )
+
+        currentActivity = nil
+
+        // Reload timeline from DB
+        timeline = DatabaseManager.shared.fetchTodayActivities()
+    }
+
 }
 
 
