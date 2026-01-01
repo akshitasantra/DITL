@@ -215,6 +215,24 @@ class DatabaseManager {
             return (activity, total)
         }
     }
+    
+    func topQuickStartActivities(limit: Int = 4) -> [String] {
+        let sql = """
+        SELECT
+            title,
+            COUNT(*) AS usage_count,
+            MAX(start_time) AS last_used
+        FROM activities
+        GROUP BY title
+        ORDER BY usage_count DESC, last_used DESC
+        LIMIT \(limit);
+        """
+        
+        let rows = query(sql: sql)
+        
+        return rows.compactMap { $0["title"] as? String }
+    }
+
 }
 
 extension Date {

@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct QuickStartRow: View {
-
-    let buttons = ["Homework", "Scroll", "Code", "Eat"]
+    let activities: [String]
     let disabled: Bool
     let onStart: (String) -> Void
 
@@ -13,7 +12,7 @@ struct QuickStartRow: View {
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 12) {
-            ForEach(buttons, id: \.self) { title in
+            ForEach(activities, id: \.self) { title in
                 Button {
                     onStart(title)
                 } label: {

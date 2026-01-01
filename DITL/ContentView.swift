@@ -115,6 +115,8 @@ struct TodayView: View {
     let onEditTimelineEntry: (Activity) -> Void
     let onAddTimelineEntry: () -> Void
     let reloadToday: () -> Void
+    
+    let defaultQuickStarts = ["Homework", "Scroll", "Code", "Eat"]
 
     var body: some View {
         ZStack {
@@ -187,6 +189,7 @@ struct TodayView: View {
 
                 // Quick Start
                 QuickStartRow(
+                    activities: resolvedQuickStarts(),
                     disabled: currentActivity != nil,
                     onStart: onQuickStart
                 )
@@ -266,6 +269,18 @@ struct TodayView: View {
 
         // Reload timeline from DB
         timeline = DatabaseManager.shared.fetchTodayActivities()
+    }
+
+    func resolvedQuickStarts() -> [String] {
+        let top = DatabaseManager.shared.topQuickStartActivities()
+        
+        if top.count == 4 {
+            return top
+        }
+        
+        // Fill missing slots with defaults
+        let remaining = defaultQuickStarts.filter { !top.contains($0) }
+        return top + remaining.prefix(4 - top.count)
     }
 
 }
