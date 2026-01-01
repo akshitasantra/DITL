@@ -11,6 +11,8 @@ struct EditActivitySheet: View {
     @State private var title: String
     @State private var startTime: Date
     @State private var endTime: Date
+    
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
 
     let onSave: (String, Date, Date) -> Void
 
@@ -30,16 +32,16 @@ struct EditActivitySheet: View {
 
             Text(mode == .add ? "Add Activity" : "Edit Activity")
                 .font(AppFonts.vt323(32))
-                .foregroundColor(AppColors.black)
+                .foregroundColor(AppColors.black(for: appTheme))
 
             // Title field
             TextField("Activity name", text: $title)
                 .padding()
-                .background(AppColors.lavenderQuick)
+                .background(AppColors.lavenderQuick(for: appTheme))
                 .cornerRadius(AppLayout.cornerRadius)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
-                        .stroke(Color.black, lineWidth: 1)
+                        .stroke(AppColors.black(for: appTheme), lineWidth: 1)
                 )
 
             // Start time
@@ -70,7 +72,7 @@ struct EditActivitySheet: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 40)
                     .padding(.vertical, 14)
-                    .background(AppColors.pinkPrimary)
+                    .background(AppColors.pinkPrimary(for: appTheme))
                     .cornerRadius(AppLayout.cornerRadius)
             }
 

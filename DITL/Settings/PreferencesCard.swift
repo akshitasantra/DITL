@@ -1,23 +1,30 @@
 import SwiftUI
 
 struct PreferencesCard: View {
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+
     var body: some View {
         ZStack {
-            // Card background + content
             VStack(spacing: 16) {
-                PreferenceButton(title: "Theme", iconName: "cloudy") {}
+                PreferenceButton(
+                    title: "Theme",
+                    iconName: themeIcon
+                ) {
+                    toggleTheme()
+                }
+
                 PreferenceButton(title: "Notifications", iconName: "notification") {}
                 PreferenceButton(title: "Sound", iconName: "high-volume") {}
             }
             .padding(20)
             .frame(maxWidth: .infinity)
-            .background(AppColors.pinkCard)
+            .background(AppColors.pinkCard(for: appTheme))
             .cornerRadius(AppLayout.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
-                    .stroke(Color.black, lineWidth: 1)
+                    .stroke(AppColors.black(for: appTheme), lineWidth: 1)
             )
-            .shadow(color: Color.black.opacity(0.10), radius: 12, x: 0, y: 4)
+            .shadow(color: AppColors.black(for: appTheme).opacity(0.10), radius: 12, x: 0, y: 4)
 
             // Decorative icons anchored to card corners
             .overlay(alignment: .topLeading) {
@@ -46,19 +53,20 @@ struct PreferencesCard: View {
             }
         }
     }
-}
-
-#Preview {
-    ZStack {
-        AppColors.background
-        PreferencesCard()
-            .padding()
+    
+    private var themeIcon: String {
+        appTheme == .light ? "cloudy" : "dark-cloudy"
     }
+    
+    private func toggleTheme() {
+            appTheme = (appTheme == .light) ? .dark : .light
+        }
 }
 
 
-// Single preference button with custom icons
 struct PreferenceButton: View {
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
     let title: String
     let iconName: String
     var action: () -> Void
@@ -66,7 +74,6 @@ struct PreferenceButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                // Icon container with extra padding to shift right
                 Image(iconName)
                     .resizable()
                     .frame(width: 24, height: 24)
@@ -81,14 +88,14 @@ struct PreferenceButton: View {
             }
             .padding(.vertical, 16)
             .frame(width: 200)
-            .background(AppColors.lavenderQuick)
+            .background(AppColors.lavenderQuick(for: appTheme))
             .cornerRadius(AppLayout.cornerRadius)
         }
         .overlay(
             RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
-                .stroke(Color.black, lineWidth: 1)
+                .stroke(AppColors.black(for: appTheme), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.1), radius: 12, x: 0, y: 4)
+        .shadow(color: AppColors.black(for: appTheme).opacity(0.1), radius: 12, x: 0, y: 4)
     }
 }
 

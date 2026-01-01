@@ -2,6 +2,7 @@ import SwiftUI
 
 // MARK: - Root View
 struct ContentView: View {
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
     @State private var showingSettings = false
     @State private var showingWrapped = false
     @State private var showingManualStart = false
@@ -37,6 +38,9 @@ struct ContentView: View {
                 )
             }
         }
+        .preferredColorScheme(
+            appTheme == .dark ? ColorScheme.dark : ColorScheme.light
+        )
         .onAppear {
             reloadToday()
         }
@@ -108,6 +112,8 @@ struct TodayView: View {
     @Binding var currentActivity: Activity?
     @Binding var timeline: [Activity]
 
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+
     let onSettingsTapped: () -> Void
     let onWrappedTapped: () -> Void
     let onQuickStart: (String) -> Void
@@ -120,7 +126,7 @@ struct TodayView: View {
 
     var body: some View {
         ZStack {
-            AppColors.background
+            AppColors.background(for: appTheme)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -128,9 +134,9 @@ struct TodayView: View {
                     // Wrapped Button on the left
                     Button(action: onWrappedTapped) {
                         Image(systemName: "list.clipboard")
-                            .foregroundColor(AppColors.black)
+                            .foregroundColor(Color.black)
                             .padding(10)
-                            .background(AppColors.lavenderQuick)
+                            .background(AppColors.lavenderQuick(for: appTheme))
                             .clipShape(Circle())
                     }
                     
@@ -139,9 +145,9 @@ struct TodayView: View {
                     // Settings Button on the right
                     Button(action: onSettingsTapped) {
                         Image(systemName: "gearshape.fill")
-                            .foregroundColor(AppColors.black)
+                            .foregroundColor(Color.black)
                             .padding(10)
-                            .background(AppColors.lavenderQuick)
+                            .background(AppColors.lavenderQuick(for: appTheme))
                             .clipShape(Circle())
                     }
                 }
@@ -158,7 +164,7 @@ struct TodayView: View {
 
                         Text("Today")
                             .font(AppFonts.vt323(42))
-                            .foregroundColor(AppColors.pinkPrimary)
+                            .foregroundColor(AppColors.pinkPrimary(for: appTheme))
 
                         Image("star")
                             .resizable()
@@ -168,7 +174,7 @@ struct TodayView: View {
 
                     Text(formattedDate())
                         .font(AppFonts.rounded(16))
-                        .foregroundColor(AppColors.pinkPrimary)
+                        .foregroundColor(AppColors.pinkPrimary(for: appTheme))
                 }
 
                 // Current Activity
@@ -199,7 +205,7 @@ struct TodayView: View {
                 VStack(spacing: 12) {
                     Text("Today’s Timeline")
                         .font(AppFonts.vt323(40))
-                        .foregroundColor(AppColors.black)
+                        .foregroundColor(AppColors.black(for: appTheme))
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
                     
@@ -237,9 +243,9 @@ struct TodayView: View {
                         onAddTimelineEntry()
                     } label: {
                         Image(systemName: "plus")
-                            .foregroundColor(.black)
+                            .foregroundColor(Color.black)
                             .padding(8)
-                            .background(AppColors.lavenderQuick)
+                            .background(AppColors.lavenderQuick(for: appTheme))
                             .clipShape(Circle())
                     }
             }
@@ -288,20 +294,22 @@ struct TodayView: View {
 
 // MARK: - Settings View
 struct SettingsView: View {
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
     var onBack: () -> Void
 
     var body: some View {
         ZStack {
-            AppColors.background
+            AppColors.background(for: appTheme)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
                 HStack {
                     Button(action: onBack) {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(AppColors.black)
+                            .foregroundColor(Color.black)
                             .padding(10)
-                            .background(AppColors.lavenderQuick)
+                            .background(AppColors.lavenderQuick(for: appTheme))
                             .clipShape(Circle())
                     }
                     Spacer()
@@ -318,7 +326,7 @@ struct SettingsView: View {
 
                         Text("Settings")
                             .font(AppFonts.vt323(42))
-                            .foregroundColor(AppColors.pinkPrimary)
+                            .foregroundColor(AppColors.pinkPrimary(for: appTheme))
 
                         Image("star")
                             .resizable()
@@ -343,11 +351,13 @@ struct SQLDashboardView: View {
     @State private var totalToday: Int = 0
     @State private var mostTimeConsuming: [(Activity, Int)] = []
 
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
     var onBack: () -> Void
 
     var body: some View {
         ZStack {
-            AppColors.background
+            AppColors.background(for: appTheme)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -356,9 +366,9 @@ struct SQLDashboardView: View {
                 HStack {
                     Button(action: onBack) {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(AppColors.black)
+                            .foregroundColor(Color.black)
                             .padding(10)
-                            .background(AppColors.lavenderQuick)
+                            .background(AppColors.lavenderQuick(for: appTheme))
                             .clipShape(Circle())
                     }
                     Spacer()
@@ -376,7 +386,7 @@ struct SQLDashboardView: View {
 
                         Text("DITL Wrapped")
                             .font(AppFonts.vt323(42))
-                            .foregroundColor(AppColors.pinkPrimary)
+                            .foregroundColor(AppColors.pinkPrimary(for: appTheme))
 
                         Image("star")
                             .resizable()
@@ -386,7 +396,7 @@ struct SQLDashboardView: View {
 
                     Text("Your day, summarized")
                         .font(AppFonts.rounded(16))
-                        .foregroundColor(AppColors.pinkPrimary)
+                        .foregroundColor(AppColors.pinkPrimary(for: appTheme))
                 }
                 .padding(.top, 12)
 
@@ -400,7 +410,7 @@ struct SQLDashboardView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Most Time-Consuming Activities")
                                 .font(AppFonts.vt323(28))
-                                .foregroundColor(AppColors.black)
+                                .foregroundColor(AppColors.black(for: appTheme))
 
                             ForEach(mostTimeConsuming, id: \.0.id) { activity, minutes in
                                 WrappedActivityRow(
@@ -431,3 +441,4 @@ struct SQLDashboardView: View {
         )
     }
 }
+

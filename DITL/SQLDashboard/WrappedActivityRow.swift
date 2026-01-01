@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct WrappedActivityRow: View {
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
     let activity: Activity
     let minutes: Int
 
@@ -8,21 +10,21 @@ struct WrappedActivityRow: View {
         HStack {
             Text(activity.title)
                 .font(AppFonts.rounded(18))
-                .foregroundColor(AppColors.black)
+                .foregroundColor(AppColors.black(for: appTheme))
 
             Spacer()
 
             Text("\(minutes) min")
                 .font(AppFonts.vt323(22))
-                .foregroundColor(AppColors.black)
+                .foregroundColor(AppColors.black(for: appTheme))
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(AppColors.lavenderQuick)
+        .background(AppColors.lavenderQuick(for: appTheme))
         .cornerRadius(AppLayout.cornerRadius)
         .overlay(
             RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
-                .stroke(Color.black, lineWidth: 1)
+                .stroke(AppColors.black(for: appTheme), lineWidth: 1)
         )
     }
 }

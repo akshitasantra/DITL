@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct QuickStartRow: View {
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
     let activities: [String]
     let disabled: Bool
     let onStart: (String) -> Void
@@ -18,16 +20,16 @@ struct QuickStartRow: View {
                 } label: {
                     Text(title)
                         .font(AppFonts.rounded(10))
-                        .foregroundColor(AppColors.black)
+                        .foregroundColor(Color.black)
                         .padding(.vertical, 12)
                         .frame(width: 100)
-                        .background(AppColors.lavenderQuick)
+                        .background(AppColors.lavenderQuick(for: appTheme))
                         .cornerRadius(AppLayout.cornerRadius)
                         .overlay(
                             RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
-                                .stroke(Color.black, lineWidth: 1)
+                                .stroke(AppColors.black(for: appTheme), lineWidth: 1)
                         )
-                        .shadow(color: Color.black.opacity(0.10), radius: 12, x: 0, y: 4)
+                        .shadow(color: AppColors.black(for: appTheme).opacity(0.10), radius: 12, x: 0, y: 4)
                         .opacity(disabled ? 0.5 : 1)
                 }
                 .disabled(disabled)

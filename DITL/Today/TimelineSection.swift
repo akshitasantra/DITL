@@ -9,12 +9,14 @@ struct TimelineSection: View {
 
     @State private var pendingDeleteId: Int? = nil
 
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
 
             Text("Add a clip & track your time here")
                 .font(AppFonts.rounded(12))
-                .foregroundColor(AppColors.black)
+                .foregroundColor(AppColors.black(for: appTheme))
                 .frame(maxWidth: .infinity)
                 .multilineTextAlignment(.center)
 
@@ -58,11 +60,11 @@ struct TimelineSection: View {
             .listStyle(.plain)
             .frame(height: 140)
             .scrollContentBackground(.hidden)
-            .background(AppColors.pinkCard)
+            .background(AppColors.pinkCard(for: appTheme))
             .cornerRadius(AppLayout.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
-                    .stroke(Color.black, lineWidth: 1)
+                    .stroke(AppColors.black(for: appTheme), lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.10), radius: 12, x: 0, y: 4)
         }
@@ -81,23 +83,25 @@ struct TimelineSection: View {
 
 
 struct EmptyTimelineView: View {
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
     var body: some View {
         VStack(spacing: 8) {
             Text("No timeline entries yet")
                 .font(AppFonts.vt323(20))
-                .foregroundColor(AppColors.black)
+                .foregroundColor(AppColors.black(for: appTheme))
 
             Text("Your completed activities will show up here!")
                 .font(AppFonts.vt323(16))
-                .foregroundColor(AppColors.black)
+                .foregroundColor(AppColors.black(for: appTheme))
         }
         .padding(20)
         .frame(maxWidth: .infinity)
-        .background(AppColors.pinkCard)
+        .background(AppColors.pinkCard(for: appTheme))
         .cornerRadius(AppLayout.cornerRadius)
         .overlay(
             RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
-                .stroke(Color.black, lineWidth: 1)
+                .stroke(AppColors.black(for: appTheme), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.1), radius: 12, x: 0, y: 4)
     }
