@@ -32,6 +32,7 @@ struct QuickStartRow: View {
                         .shadow(color: AppColors.black(for: appTheme).opacity(0.10), radius: 12, x: 0, y: 4)
                         .opacity(disabled ? 0.5 : 1)
                 }
+                .withClickSound()
                 .disabled(disabled)
             }
         }
@@ -39,3 +40,4 @@ struct QuickStartRow: View {
         .padding(.horizontal, AppLayout.screenPadding)
     }
 }
+

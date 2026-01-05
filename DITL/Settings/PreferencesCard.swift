@@ -1,13 +1,19 @@
 import SwiftUI
 
+enum AppNotifications {
+    static let enabledKey = "notificationsEnabled"
+}
+
+enum AppSound {
+    static let enabledKey = "soundEnabled"
+}
+
 struct PreferencesCard: View {
     @AppStorage("appTheme") private var appTheme: AppTheme = .light
-    
-    enum AppNotifications {
-        static let enabledKey = "notificationsEnabled"
-    }
     @AppStorage(AppNotifications.enabledKey)
     private var notificationsEnabled = false
+    @AppStorage(AppSound.enabledKey)
+    private var soundEnabled = true
 
     var body: some View {
         ZStack {
@@ -26,7 +32,12 @@ struct PreferencesCard: View {
                     toggleNotifications()
                 }
                 
-                PreferenceButton(title: "Sound", iconName: "high-volume") {}
+                PreferenceButton(
+                    title: "Sound",
+                    iconName: soundEnabled ? "high-volume" : "mute"
+                ) {
+                    soundEnabled.toggle()
+                }
             }
             .padding(20)
             .frame(maxWidth: .infinity)
@@ -93,6 +104,20 @@ struct PreferencesCard: View {
     }
 }
 
+extension Button {
+    func withClickSound() -> some View {
+        self.simultaneousGesture(
+            TapGesture().onEnded {
+                if UserDefaults.standard.bool(
+                    forKey: AppSound.enabledKey
+                ) {
+                    SoundManager.shared.playClick()
+                }
+            }
+        )
+    }
+}
+
 
 struct PreferenceButton: View {
     @AppStorage("appTheme") private var appTheme: AppTheme = .light
@@ -121,6 +146,7 @@ struct PreferenceButton: View {
             .background(AppColors.lavenderQuick(for: appTheme))
             .cornerRadius(AppLayout.cornerRadius)
         }
+        .withClickSound()
         .overlay(
             RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
                 .stroke(AppColors.black(for: appTheme), lineWidth: 1)

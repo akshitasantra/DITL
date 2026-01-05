@@ -51,6 +51,7 @@ struct CurrentActivityCard: View {
                         .background(AppColors.pinkPrimary(for: appTheme))
                         .cornerRadius(AppLayout.cornerRadius)
                 }
+                .withClickSound()
                 .overlay(
                     RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
                         .stroke(AppColors.black(for: appTheme), lineWidth: 1)
@@ -140,10 +141,11 @@ struct NoActivityCard: View {
                     .padding(.vertical, 16)
                     .background(AppColors.pinkPrimary(for: appTheme))
                     .cornerRadius(AppLayout.cornerRadius)
-                }.overlay(
-                    RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
-                        .stroke(AppColors.black(for: appTheme), lineWidth: 1)
-                )
+            }.withClickSound()
+            .overlay(
+                RoundedRectangle(cornerRadius: AppLayout.cornerRadius)
+                    .stroke(AppColors.black(for: appTheme), lineWidth: 1)
+            )
         }
         .padding(20)
         .frame(maxWidth: .infinity)

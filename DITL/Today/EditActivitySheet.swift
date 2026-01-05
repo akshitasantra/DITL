@@ -82,3 +82,4 @@ struct EditActivitySheet: View {
         .presentationDetents([.medium])
     }
 }
+
