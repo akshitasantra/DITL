@@ -87,12 +87,12 @@ struct ContentView: View {
                 }
     }
 
-    // MARK: - DB Sync
+    // MARK: DB Sync
     private func reloadToday() {
         timeline = DatabaseManager.shared.fetchTodayActivities()
     }
 
-    // MARK: - Activity Actions
+    // MARK: Activity Actions
     private func startActivity(title: String) {
         guard currentActivity == nil else { return }
 
@@ -107,7 +107,7 @@ struct ContentView: View {
 }
 
 
-// MARK: - Today View
+// MARK: Today View
 struct TodayView: View {
     @Binding var currentActivity: Activity?
     @Binding var timeline: [Activity]
@@ -292,7 +292,7 @@ struct TodayView: View {
 }
 
 
-// MARK: - Settings View
+// MARK: Settings View
 struct SettingsView: View {
     @AppStorage("appTheme") private var appTheme: AppTheme = .light
     
@@ -346,7 +346,7 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - SQLDashboard
+// MARK: SQLDashboard
 struct SQLDashboardView: View {
     @State private var totalToday: Int = 0
     @State private var mostTimeConsuming: [(Activity, Int)] = []

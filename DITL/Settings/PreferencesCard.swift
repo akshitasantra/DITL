@@ -2,6 +2,12 @@ import SwiftUI
 
 struct PreferencesCard: View {
     @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
+    enum AppNotifications {
+        static let enabledKey = "notificationsEnabled"
+    }
+    @AppStorage(AppNotifications.enabledKey)
+    private var notificationsEnabled = false
 
     var body: some View {
         ZStack {
@@ -13,7 +19,13 @@ struct PreferencesCard: View {
                     toggleTheme()
                 }
 
-                PreferenceButton(title: "Notifications", iconName: "notification") {}
+                PreferenceButton(
+                    title: "Notifications",
+                    iconName: notificationsIcon
+                ) {
+                    toggleNotifications()
+                }
+                
                 PreferenceButton(title: "Sound", iconName: "high-volume") {}
             }
             .padding(20)
@@ -58,9 +70,27 @@ struct PreferencesCard: View {
         appTheme == .light ? "cloudy" : "dark-cloudy"
     }
     
+    private var notificationsIcon: String {
+        notificationsEnabled ? "notification" : "mute-notification"
+    }
+    
     private func toggleTheme() {
-            appTheme = (appTheme == .light) ? .dark : .light
+        appTheme = (appTheme == .light) ? .dark : .light
+    }
+    
+    private func toggleNotifications() {
+        if notificationsEnabled {
+            NotificationManager.shared.cancelAll()
+            notificationsEnabled = false
+        } else {
+            NotificationManager.shared.requestPermission { granted in
+                if granted {
+                    NotificationManager.shared.scheduleDailyReminder()
+                    notificationsEnabled = true
+                }
+            }
         }
+    }
 }
 
 

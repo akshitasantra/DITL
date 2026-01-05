@@ -101,7 +101,7 @@ struct CurrentActivityCard: View {
         }
     }
 
-    // MARK: - Helpers
+    // MARK: Helpers
     private func formattedTime(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.timeStyle = .short

@@ -34,7 +34,7 @@ class DatabaseManager {
         execute(sql: createTableString)
     }
 
-    // MARK: - Raw SQL Execution Helpers
+    // MARK: Raw SQL Execution Helpers
 
     @discardableResult
     func execute(sql: String) -> Bool {
@@ -188,7 +188,7 @@ class DatabaseManager {
         execute(sql: sql)
     }
 
-    // MARK: - Example Queries
+    // MARK: Example Queries
 
     func totalTimeToday() -> Int {
         let sql = "SELECT SUM(duration_minutes) as total FROM activities WHERE DATE(start_time, 'unixepoch') = DATE('now');"

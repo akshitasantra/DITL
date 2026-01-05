@@ -10,13 +10,13 @@ struct WrappedActivityRow: View {
         HStack {
             Text(activity.title)
                 .font(AppFonts.rounded(18))
-                .foregroundColor(AppColors.black(for: appTheme))
+                .foregroundColor(Color.black)
 
             Spacer()
 
             Text("\(minutes) min")
                 .font(AppFonts.vt323(22))
-                .foregroundColor(AppColors.black(for: appTheme))
+                .foregroundColor(Color.black)
         }
         .padding(16)
         .frame(maxWidth: .infinity)
