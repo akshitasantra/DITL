@@ -6,7 +6,15 @@
 	<array>
 		<string>VT323-Regular.ttf</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Record short clips for your day-in-the-life video.</string>
 	<key>UIBackgroundModes</key>
 	<array/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Record audio with your video clips.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save video clips to your Photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Access clips for creating your daily video.</string>
 </dict>
 </plist>

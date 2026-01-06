@@ -1,48 +1,92 @@
 import SwiftUI
 
 // MARK: - Root View
+enum AppTab {
+    case today
+    case stats
+    case video
+}
+
 struct ContentView: View {
     @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    @State private var selectedTab: AppTab = .today
+
+    // Existing state
     @State private var showingSettings = false
-    @State private var showingWrapped = false
     @State private var showingManualStart = false
     @State private var editingActivity: Activity? = nil
     @State private var addingActivity: Bool = false
-
     @State private var currentActivity: Activity? = nil
     @State private var timeline: [Activity] = []
+    @State private var settingsSourceTab: AppTab? = nil
 
     var body: some View {
         ZStack {
-            if showingSettings {
-                SettingsView { showingSettings = false }
-            }
-            else if showingWrapped {
-                SQLDashboardView{ showingWrapped = false }
-            }
-            else {
+            TabView(selection: $selectedTab) {
+
+                // TODAY TAB
                 TodayView(
                     currentActivity: $currentActivity,
                     timeline: $timeline,
-                    onSettingsTapped: { showingSettings = true },
-                    onWrappedTapped: { showingWrapped = true },
+                    onSettingsTapped: {
+                        settingsSourceTab = .today
+                        showingSettings = true
+                    },
+                    onWrappedTapped: { selectedTab = .stats },
                     onQuickStart: startActivity,
                     onManualStartTapped: { showingManualStart = true },
-                    onEditTimelineEntry: { activity in
-                        editingActivity = activity
-                    },
-                    onAddTimelineEntry: {
-                        addingActivity = true
-                    },
+                    onEditTimelineEntry: { editingActivity = $0 },
+                    onAddTimelineEntry: { addingActivity = true },
                     reloadToday: reloadToday
                 )
+                .tabItem {
+                    Label("Today", systemImage: "calendar")
+                }
+                .tag(AppTab.today)
+
+                // STATS TAB
+                SQLDashboardView (
+                    onSettingsTapped: {
+                        settingsSourceTab = .stats
+                        showingSettings = true
+                    }
+                )
+                .tabItem {
+                    Label("Stats", systemImage: "chart.bar")
+                }
+                .tag(AppTab.stats)
+
+                // VIDEO TAB
+                VideoView(
+                    onSettingsTapped: {
+                        settingsSourceTab = .video
+                        showingSettings = true
+                    }
+                )
+                    .tabItem {
+                        Label("Video", systemImage: "video.fill")
+                    }
+                    .tag(AppTab.video)
+            }
+
+            // SETTINGS OVERLAY
+            if showingSettings {
+                SettingsView {
+                    showingSettings = false
+                    if let source = settingsSourceTab {
+                        selectedTab = source
+                    }
+                }
+                .zIndex(1)
             }
         }
-        .preferredColorScheme(
-            appTheme == .dark ? ColorScheme.dark : ColorScheme.light
-        )
+        .preferredColorScheme(appTheme == .dark ? .dark : .light)
         .onAppear {
+            TabBarStyler.apply(theme: appTheme)
             reloadToday()
+        }
+        .onChange(of: appTheme) { newTheme in
+            TabBarStyler.apply(theme: newTheme)
         }
         .sheet(isPresented: $showingManualStart) {
             ManualStartSheet { title in
@@ -62,42 +106,41 @@ struct ContentView: View {
                 )
 
                 reloadToday()
-                addingActivity = false
             }
         }
         .sheet(isPresented: $addingActivity) {
-                    let dummyActivity = Activity(
-                        id: -1,
-                        title: "",
-                        startTime: Date(),
-                        endTime: Date(),
-                        durationMinutes: 0
-                    )
-                    EditActivitySheet(activity: dummyActivity) { newTitle, newStart, newEnd in
-                        let duration = Int(newEnd.timeIntervalSince(newStart) / 60)
-                        DatabaseManager.shared.createActivity(
-                            title: newTitle,
-                            start: newStart,
-                            end: newEnd,
-                            duration: duration
-                        )
-                        reloadToday()
-                        addingActivity = false
-                    }
-                }
+            let dummy = Activity(
+                id: -1,
+                title: "",
+                startTime: Date(),
+                endTime: Date(),
+                durationMinutes: 0
+            )
+            EditActivitySheet(activity: dummy) { title, start, end in
+                let duration = Int(end.timeIntervalSince(start) / 60)
+                DatabaseManager.shared.createActivity(
+                    title: title,
+                    start: start,
+                    end: end,
+                    duration: duration
+                )
+                reloadToday()
+            }
+        }
+        
     }
 
-    // MARK: DB Sync
+    // MARK: - DB
     private func reloadToday() {
         timeline = DatabaseManager.shared.fetchTodayActivities()
     }
 
-    // MARK: Activity Actions
+    // MARK: - Activity
     private func startActivity(title: String) {
         guard currentActivity == nil else { return }
 
         currentActivity = Activity(
-            id: -1, // temp ID for in-progress activity
+            id: -1,
             title: title,
             startTime: Date(),
             endTime: nil,
@@ -105,6 +148,7 @@ struct ContentView: View {
         )
     }
 }
+
 
 
 // MARK: Today View
@@ -129,117 +173,109 @@ struct TodayView: View {
             AppColors.background(for: appTheme)
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                HStack {
-                    // Wrapped Button on the left
-                    Button(action: onWrappedTapped) {
-                        Image(systemName: "list.clipboard")
-                            .foregroundColor(Color.black)
-                            .padding(10)
-                            .background(AppColors.lavenderQuick(for: appTheme))
-                            .clipShape(Circle())
+            ScrollView{
+                VStack(spacing: 0) {
+                    HStack {
+                        Spacer()
+                        
+                        // Settings Button on the right
+                        Button(action: onSettingsTapped) {
+                            Image(systemName: "gearshape.fill")
+                                .foregroundColor(Color.black)
+                                .padding(10)
+                                .background(AppColors.lavenderQuick(for: appTheme))
+                                .clipShape(Circle())
+                        }
                     }
+                    .padding(.top, 24)
+                    .padding(.horizontal, AppLayout.screenPadding)
+                    
+                    // Header
+                    VStack(spacing: 4) {
+                        HStack(spacing: 8) {
+                            Image("star")
+                                .resizable()
+                                .rotationEffect(.degrees(45))
+                                .frame(width: 24, height: 24)
+                            
+                            Text("Today")
+                                .font(AppFonts.vt323(42))
+                                .foregroundColor(AppColors.pinkPrimary(for: appTheme))
+                            
+                            Image("star")
+                                .resizable()
+                                .rotationEffect(.degrees(45))
+                                .frame(width: 24, height: 24)
+                        }
+                        
+                        Text(formattedDate())
+                            .font(AppFonts.rounded(16))
+                            .foregroundColor(AppColors.pinkPrimary(for: appTheme))
+                    }
+                    
+                    // Current Activity
+                    Group {
+                        if let activity = currentActivity {
+                            CurrentActivityCard(
+                                activity: activity,
+                                onEnd: endCurrentActivity
+                            )
+                        } else {
+                            NoActivityCard(
+                                onStartTapped: onManualStartTapped
+                            )
+                        }
+                    }
+                    .padding(.top, 32)
+                    .padding(.horizontal, AppLayout.screenPadding)
+                    
+                    // Quick Start
+                    QuickStartRow(
+                        activities: resolvedQuickStarts(),
+                        disabled: currentActivity != nil,
+                        onStart: onQuickStart
+                    )
+                    .padding(.top, 16)
+                    
+                    // Timeline
+                    VStack(spacing: 12) {
+                        Text("Today’s Timeline")
+                            .font(AppFonts.vt323(40))
+                            .foregroundColor(AppColors.black(for: appTheme))
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
+                        
+                        let displayTimeline: [Activity] = {
+                            if let current = currentActivity {
+                                return timeline + [current]
+                            }
+                            else {
+                                return timeline
+                            }
+                        }()
+                        
+                        if displayTimeline.isEmpty {
+                            EmptyTimelineView()
+                                .padding(.horizontal, AppLayout.screenPadding)
+                        } else {
+                            TimelineSection(
+                                timeline: timeline,
+                                currentActivity: currentActivity,
+                                onDelete: { activity in
+                                    DatabaseManager.shared.deleteActivity(id: activity.id)
+                                    reloadToday()
+                                },
+                                onEdit: { activity in
+                                    onEditTimelineEntry(activity)
+                                }
+                            )
+                        }
+                    }
+                    .padding(.top, 24)
                     
                     Spacer()
                     
-                    // Settings Button on the right
-                    Button(action: onSettingsTapped) {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundColor(Color.black)
-                            .padding(10)
-                            .background(AppColors.lavenderQuick(for: appTheme))
-                            .clipShape(Circle())
-                    }
-                }
-                .padding(.top, 24)
-                .padding(.horizontal, AppLayout.screenPadding)
-
-                // Header
-                VStack(spacing: 4) {
-                    HStack(spacing: 8) {
-                        Image("star")
-                            .resizable()
-                            .rotationEffect(.degrees(45))
-                            .frame(width: 24, height: 24)
-
-                        Text("Today")
-                            .font(AppFonts.vt323(42))
-                            .foregroundColor(AppColors.pinkPrimary(for: appTheme))
-
-                        Image("star")
-                            .resizable()
-                            .rotationEffect(.degrees(45))
-                            .frame(width: 24, height: 24)
-                    }
-
-                    Text(formattedDate())
-                        .font(AppFonts.rounded(16))
-                        .foregroundColor(AppColors.pinkPrimary(for: appTheme))
-                }
-
-                // Current Activity
-                Group {
-                    if let activity = currentActivity {
-                        CurrentActivityCard(
-                            activity: activity,
-                            onEnd: endCurrentActivity
-                        )
-                    } else {
-                        NoActivityCard(
-                            onStartTapped: onManualStartTapped
-                        )
-                    }
-                }
-                .padding(.top, 32)
-                .padding(.horizontal, AppLayout.screenPadding)
-
-                // Quick Start
-                QuickStartRow(
-                    activities: resolvedQuickStarts(),
-                    disabled: currentActivity != nil,
-                    onStart: onQuickStart
-                )
-                .padding(.top, 16)
-
-                // Timeline
-                VStack(spacing: 12) {
-                    Text("Today’s Timeline")
-                        .font(AppFonts.vt323(40))
-                        .foregroundColor(AppColors.black(for: appTheme))
-                        .frame(maxWidth: .infinity)
-                        .multilineTextAlignment(.center)
-                    
-                    let displayTimeline: [Activity] = {
-                        if let current = currentActivity {
-                            return timeline + [current]
-                        }
-                        else {
-                            return timeline
-                        }
-                    }()
-
-                    if displayTimeline.isEmpty {
-                        EmptyTimelineView()
-                            .padding(.horizontal, AppLayout.screenPadding)
-                    } else {
-                        TimelineSection(
-                            timeline: timeline,
-                            currentActivity: currentActivity,
-                            onDelete: { activity in
-                                DatabaseManager.shared.deleteActivity(id: activity.id)
-                                reloadToday()
-                            },
-                            onEdit: { activity in
-                                onEditTimelineEntry(activity)
-                            }
-                        )
-                    }
-                }
-                .padding(.top, 24)
-
-                Spacer()
-                
-                Button {
+                    Button {
                         onAddTimelineEntry()
                     } label: {
                         Image(systemName: "plus")
@@ -248,6 +284,7 @@ struct TodayView: View {
                             .background(AppColors.lavenderQuick(for: appTheme))
                             .clipShape(Circle())
                     }
+                }
             }
         }
     }
@@ -345,7 +382,6 @@ struct SettingsView: View {
         }
     }
 }
-
 // MARK: SQLDashboard
 struct SQLDashboardView: View {
     @State private var totalToday: Int = 0
@@ -353,7 +389,7 @@ struct SQLDashboardView: View {
 
     @AppStorage("appTheme") private var appTheme: AppTheme = .light
     
-    var onBack: () -> Void
+    let onSettingsTapped: () -> Void
 
     var body: some View {
         ZStack {
@@ -361,17 +397,18 @@ struct SQLDashboardView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-
-                // Back Button (matches Settings)
                 HStack {
-                    Button(action: onBack) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(Color.black)
+                    Spacer()
+                    
+                    Button {
+                        onSettingsTapped()
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.black)
                             .padding(10)
                             .background(AppColors.lavenderQuick(for: appTheme))
                             .clipShape(Circle())
                     }
-                    Spacer()
                 }
                 .padding(.top, 24)
                 .padding(.horizontal, AppLayout.screenPadding)
@@ -442,3 +479,47 @@ struct SQLDashboardView: View {
     }
 }
 
+// MARK: Video View
+struct VideoView: View {
+    @AppStorage("appTheme") private var appTheme: AppTheme = .light
+    
+    let onSettingsTapped: () -> Void
+
+    var body: some View {
+        ZStack {
+            AppColors.background(for: appTheme)
+                .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                HStack {
+                    Spacer()
+
+                    Button {
+                        onSettingsTapped()
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.black)
+                            .padding(10)
+                            .background(AppColors.lavenderQuick(for: appTheme))
+                            .clipShape(Circle())
+                    }
+                }
+                .padding(.top, 24)
+                .padding(.horizontal, AppLayout.screenPadding)
+
+                Text("Video Diary")
+                    .font(AppFonts.vt323(42))
+                    .foregroundColor(AppColors.pinkPrimary(for: appTheme))
+
+                Text("Coming soon 🎥")
+                    .font(AppFonts.rounded(18))
+                    .foregroundColor(AppColors.black(for: appTheme))
+
+                Image(systemName: "video.circle.fill")
+                    .resizable()
+                    .frame(width: 120, height: 120)
+                    .foregroundColor(AppColors.lavenderQuick(for: appTheme))
+            }
+        }
+    }
+}

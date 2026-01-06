@@ -7,10 +7,8 @@ struct TimelineSection: View {
     let onDelete: (Activity) -> Void
     let onEdit: (Activity) -> Void
 
-    @State private var pendingDeleteId: Int? = nil
-
     @AppStorage("appTheme") private var appTheme: AppTheme = .light
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
 
@@ -21,7 +19,7 @@ struct TimelineSection: View {
                 .multilineTextAlignment(.center)
 
             List {
-                // Active activity (non-deletable)
+                // Active activity (not deletable)
                 if let active = currentActivity {
                     TimelineEntryRow(
                         timeRange: formattedTimeRange(
@@ -30,8 +28,8 @@ struct TimelineSection: View {
                         ),
                         activity: active.title
                     )
-                    .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                 }
 
                 ForEach(timeline.reversed()) { activity in
@@ -45,21 +43,21 @@ struct TimelineSection: View {
                     .onTapGesture(count: 2) {
                         onEdit(activity)
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                onDelete(activity)
-                                pendingDeleteId = nil
-                            } label: {
-                                Label("Confirm", systemImage: "trash.fill")
-                            }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            onDelete(activity)
+                        } label: {
+                            Label("Delete", systemImage: "trash.fill")
+                        }
                     }
-                    .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                 }
             }
             .listStyle(.plain)
-            .frame(height: 140)
-            .scrollContentBackground(.hidden)
+            .scrollDisabled(true)
+            .frame(maxWidth: .infinity)
+            .frame(height: listHeight)
             .background(AppColors.pinkCard(for: appTheme))
             .cornerRadius(AppLayout.cornerRadius)
             .overlay(
@@ -77,9 +75,14 @@ struct TimelineSection: View {
         formatter.timeStyle = .short
         return "\(formatter.string(from: start)) – \(formatter.string(from: end ?? Date()))"
     }
+    
+    private var listHeight: CGFloat {
+        let rowCount =
+            (currentActivity == nil ? 0 : 1) + timeline.count
+        return max(CGFloat(rowCount) * 52.5, 50)
+    }
+
 }
-
-
 
 
 struct EmptyTimelineView: View {
