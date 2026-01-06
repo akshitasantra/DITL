@@ -101,6 +101,7 @@ struct ContentView: View {
                 DatabaseManager.shared.updateActivity(
                     id: activity.id,
                     newTitle: newTitle,
+                    newStart: newStart,
                     newEnd: newEnd,
                     newDuration: duration
                 )
@@ -273,7 +274,7 @@ struct TodayView: View {
                     }
                     .padding(.top, 24)
                     
-                    Spacer()
+                    Spacer(minLength: 24)
                     
                     Button {
                         onAddTimelineEntry()
@@ -284,6 +285,7 @@ struct TodayView: View {
                             .background(AppColors.lavenderQuick(for: appTheme))
                             .clipShape(Circle())
                     }
+                    .padding(.bottom, 40)
                 }
             }
         }
@@ -494,15 +496,15 @@ struct VideoView: View {
                 HStack {
                     Spacer()
 
-                    Button {
-                        onSettingsTapped()
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundColor(.black)
-                            .padding(10)
-                            .background(AppColors.lavenderQuick(for: appTheme))
-                            .clipShape(Circle())
-                    }
+//                    Button {
+//                        onSettingsTapped()
+//                    } label: {
+//                        Image(systemName: "gearshape.fill")
+//                            .foregroundColor(.black)
+//                            .padding(10)
+//                            .background(AppColors.lavenderQuick(for: appTheme))
+//                            .clipShape(Circle())
+//                    }
                 }
                 .padding(.top, 24)
                 .padding(.horizontal, AppLayout.screenPadding)
@@ -511,7 +513,7 @@ struct VideoView: View {
                     .font(AppFonts.vt323(42))
                     .foregroundColor(AppColors.pinkPrimary(for: appTheme))
 
-                Text("Coming soon 🎥")
+                Text("Coming soon")
                     .font(AppFonts.rounded(18))
                     .foregroundColor(AppColors.black(for: appTheme))
 

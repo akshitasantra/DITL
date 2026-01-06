@@ -165,11 +165,21 @@ class DatabaseManager {
         )
     }
 
-    func updateActivity(id: Int, newTitle: String? = nil, newEnd: Date? = nil, newDuration: Int? = nil) {
+    func updateActivity(
+        id: Int,
+        newTitle: String? = nil,
+        newStart: Date? = nil,
+        newEnd: Date? = nil,
+        newDuration: Int? = nil
+    )
+    {
         var updates: [String] = []
         if let newTitle {
             let escapedTitle = newTitle.replacingOccurrences(of: "'", with: "''")
             updates.append("title = '\(escapedTitle)'")
+        }
+        if let newStart {
+            updates.append("start_time = \(newStart.timeIntervalSince1970)")
         }
         if let newEnd {
             updates.append("end_time = \(newEnd.timeIntervalSince1970)")
