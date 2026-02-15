@@ -1,9 +1,5 @@
 import SwiftUI
 
-enum AppNotifications {
-    static let enabledKey = "notificationsEnabled"
-}
-
 enum AppSound {
     static let enabledKey = "soundEnabled"
 }
@@ -12,7 +8,6 @@ struct PreferencesCard: View {
     @State private var showingThemePicker = false
     @ObservedObject private var themeManager = ThemeManager.shared
 
-    @AppStorage(AppNotifications.enabledKey) private var notificationsEnabled = false
     @AppStorage(AppSound.enabledKey) private var soundEnabled = true
 
     private var cardColor: Color { Color(hex: themeManager.theme.cardColorHex) }
@@ -28,15 +23,6 @@ struct PreferencesCard: View {
                     borderColor: primaryColor
                 ) {
                     showingThemePicker.toggle()
-                }
-
-                PreferenceButton(
-                    title: "Notifications",
-                    iconName: notificationsEnabled ? "notification" : "mute-notification",
-                    backgroundColor: cardColor,
-                    borderColor: primaryColor
-                ) {
-                    toggleNotifications()
                 }
 
                 PreferenceButton(
@@ -99,20 +85,6 @@ struct PreferencesCard: View {
                     set: { themeManager.update(useDarkBackground: $0) }
                 )
             )
-        }
-    }
-
-    private func toggleNotifications() {
-        if notificationsEnabled {
-            NotificationManager.shared.cancelAll()
-            notificationsEnabled = false
-        } else {
-            NotificationManager.shared.requestPermission { granted in
-                if granted {
-                    NotificationManager.shared.scheduleDailyReminder()
-                    notificationsEnabled = true
-                }
-            }
         }
     }
 }

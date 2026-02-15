@@ -43,7 +43,7 @@ struct SQLDashboardView: View {
                             .rotationEffect(.degrees(45))
                             .frame(width: 24, height: 24)
 
-                        Text("DITL Wrapped")
+                        Text("Dayzy Wrapped")
                             .font(AppFonts.vt323(42))
                             .foregroundColor(AppColors.primary())
 

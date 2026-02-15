@@ -11,26 +11,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		842DA2CA2EF50BA8003D53C7 /* DITL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DITL.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		842DA2CA2EF50BA8003D53C7 /* Dayzy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dayzy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		842DA2E22EF77543003D53C7 /* Exceptions for "DITL" folder in "DITL" target */ = {
+		842DA2E22EF77543003D53C7 /* Exceptions for "Dayzy" folder in "Dayzy" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 842DA2C92EF50BA8003D53C7 /* DITL */;
+			target = 842DA2C92EF50BA8003D53C7 /* Dayzy */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		842DA2CC2EF50BA8003D53C7 /* DITL */ = {
+		842DA2CC2EF50BA8003D53C7 /* Dayzy */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				842DA2E22EF77543003D53C7 /* Exceptions for "DITL" folder in "DITL" target */,
+				842DA2E22EF77543003D53C7 /* Exceptions for "Dayzy" folder in "Dayzy" target */,
 			);
-			path = DITL;
+			path = Dayzy;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -50,7 +50,7 @@
 		842DA2C12EF50BA8003D53C7 = {
 			isa = PBXGroup;
 			children = (
-				842DA2CC2EF50BA8003D53C7 /* DITL */,
+				842DA2CC2EF50BA8003D53C7 /* Dayzy */,
 				842DA2CB2EF50BA8003D53C7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,7 +58,7 @@
 		842DA2CB2EF50BA8003D53C7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				842DA2CA2EF50BA8003D53C7 /* DITL.app */,
+				842DA2CA2EF50BA8003D53C7 /* Dayzy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -66,9 +66,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		842DA2C92EF50BA8003D53C7 /* DITL */ = {
+		842DA2C92EF50BA8003D53C7 /* Dayzy */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 842DA2D52EF50BA9003D53C7 /* Build configuration list for PBXNativeTarget "DITL" */;
+			buildConfigurationList = 842DA2D52EF50BA9003D53C7 /* Build configuration list for PBXNativeTarget "Dayzy" */;
 			buildPhases = (
 				842DA2C62EF50BA8003D53C7 /* Sources */,
 				842DA2C72EF50BA8003D53C7 /* Frameworks */,
@@ -79,14 +79,14 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				842DA2CC2EF50BA8003D53C7 /* DITL */,
+				842DA2CC2EF50BA8003D53C7 /* Dayzy */,
 			);
-			name = DITL;
+			name = Dayzy;
 			packageProductDependencies = (
 				8403DE122F048E2F006F393F /* SQLite */,
 			);
 			productName = DITL;
-			productReference = 842DA2CA2EF50BA8003D53C7 /* DITL.app */;
+			productReference = 842DA2CA2EF50BA8003D53C7 /* Dayzy.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -104,7 +104,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 842DA2C52EF50BA8003D53C7 /* Build configuration list for PBXProject "DITL" */;
+			buildConfigurationList = 842DA2C52EF50BA8003D53C7 /* Build configuration list for PBXProject "Dayzy" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -121,7 +121,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				842DA2C92EF50BA8003D53C7 /* DITL */,
+				842DA2C92EF50BA8003D53C7 /* Dayzy */,
 			);
 		};
 /* End PBXProject section */
@@ -270,15 +270,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = DITL/DITL.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Dayzy/Dayzy.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 29V8T5U382;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = DITL/Info.plist;
+				INFOPLIST_FILE = Dayzy/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Record short video clips for your daily timeline.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record audio with your video clips.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save video clips to your Photos.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Access clips for creating your daily video.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -294,8 +298,9 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.akshita.DITL;
+				PRODUCT_BUNDLE_IDENTIFIER = com.akshita.Dayzy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -315,15 +320,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = DITL/DITL.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Dayzy/Dayzy.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 29V8T5U382;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = DITL/Info.plist;
+				INFOPLIST_FILE = Dayzy/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Record short video clips for your daily timeline.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record audio with your video clips.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save video clips to your Photos.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Access clips for creating your daily video.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -339,8 +348,9 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.akshita.DITL;
+				PRODUCT_BUNDLE_IDENTIFIER = com.akshita.Dayzy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -358,7 +368,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		842DA2C52EF50BA8003D53C7 /* Build configuration list for PBXProject "DITL" */ = {
+		842DA2C52EF50BA8003D53C7 /* Build configuration list for PBXProject "Dayzy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				842DA2D32EF50BA9003D53C7 /* Debug */,
@@ -367,7 +377,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		842DA2D52EF50BA9003D53C7 /* Build configuration list for PBXNativeTarget "DITL" */ = {
+		842DA2D52EF50BA9003D53C7 /* Build configuration list for PBXNativeTarget "Dayzy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				842DA2D62EF50BA9003D53C7 /* Debug */,

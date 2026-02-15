@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct DITLApp: App {
+struct DayzyApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
