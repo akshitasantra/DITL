@@ -31,6 +31,10 @@ struct ContentView: View {
         }
         .preferredColorScheme(themeManager.theme.useDarkBackground ? .dark : .light)
         .onAppear {
+            // Check if there is a running activity in the DB
+            if currentActivity == nil {
+                currentActivity = DatabaseManager.shared.fetchCurrentActivity()
+            }
             reloadToday()
         }
         .sheet(isPresented: $showingManualStart, content: manualStartSheet)
@@ -106,9 +110,18 @@ private extension ContentView {
                 newDuration: duration
             )
 
+            // Sync currentActivity if this is the running activity
+            if currentActivity?.id == activity.id {
+                currentActivity?.title = title
+                currentActivity?.startTime = start
+                currentActivity?.endTime = end
+                currentActivity?.durationMinutes = duration
+            }
+
             reloadToday()
         }
     }
+
 
     func addActivitySheet() -> some View {
         let placeholder = Activity(
@@ -149,18 +162,20 @@ private extension ContentView {
 // MARK: Activity Logic
 private extension ContentView {
     func reloadToday() {
-        timeline = DatabaseManager.shared.fetchTodayActivities()
+        let allActivities = DatabaseManager.shared.fetchTodayActivities()
+        
+        // Exclude the currently running activity (endTime == nil in DB)
+        if let running = currentActivity {
+            timeline = allActivities.filter { $0.id != running.id }
+        } else {
+            timeline = allActivities
+        }
     }
 
     func startActivity(title: String) {
         guard currentActivity == nil else { return }
-
-        currentActivity = Activity(
-            id: -1,
-            title: title,
-            startTime: Date(),
-            endTime: nil,
-            durationMinutes: nil
-        )
+        currentActivity = DatabaseManager.shared.startActivity(title: title)
+        reloadToday()
     }
 }
+

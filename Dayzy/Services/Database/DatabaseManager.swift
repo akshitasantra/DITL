@@ -94,39 +94,55 @@ class DatabaseManager {
         return result
     }
     
-    func fetchTodayActivities() -> [Activity] {
+    // MARK: - Helper to get today's start and end
+    private func todayInterval() -> (start: Date, end: Date) {
         let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: Date())
-        let startInterval = startOfDay.timeIntervalSince1970
-        let endInterval = startInterval + 86400 // 24 hours later
+        let start = calendar.startOfDay(for: Date())
+        let end = calendar.date(byAdding: .day, value: 1, to: start)!
+        return (start, end)
+    }
+
+    // MARK: - Fetch today's activities with split logic
+    func fetchTodayActivities() -> [Activity] {
+        let (todayStart, todayEnd) = todayInterval()
 
         let sql = """
-        SELECT id, title, start_time, end_time, duration_minutes
+        SELECT id, title, start_time, end_time
         FROM activities
-        WHERE start_time >= \(startInterval) AND start_time < \(endInterval)
+        WHERE (start_time < \(todayEnd.timeIntervalSince1970) AND
+               (end_time IS NULL OR end_time > \(todayStart.timeIntervalSince1970)))
         ORDER BY start_time;
         """
-        let rows = query(sql: sql)
 
-        return rows.compactMap { row in
+        let rows = query(sql: sql)
+        var activities: [Activity] = []
+
+        for row in rows {
             guard
                 let id = row["id"] as? Int,
                 let title = row["title"] as? String,
                 let startRaw = row["start_time"] as? Double
-            else { return nil }
+            else { continue }
 
-            let start = Date(timeIntervalSince1970: startRaw)
-            let end = (row["end_time"] as? Double).map { Date(timeIntervalSince1970: $0) }
-            let duration = row["duration_minutes"] as? Int
+            let activityStart = Date(timeIntervalSince1970: startRaw)
+            let activityEnd = (row["end_time"] as? Double).map { Date(timeIntervalSince1970: $0) } ?? Date()
 
-            return Activity(
-                id: id,
-                title: title,
-                startTime: start,
-                endTime: end,
-                durationMinutes: duration
-            )
+            let sliceStart = max(activityStart, todayStart)
+            let sliceEnd = min(activityEnd, todayEnd)
+            let duration = Int(sliceEnd.timeIntervalSince(sliceStart) / 60)
+
+            if duration > 0 {
+                activities.append(Activity(
+                    id: id,
+                    title: title,
+                    startTime: sliceStart,
+                    endTime: sliceEnd,
+                    durationMinutes: duration
+                ))
+            }
         }
+
+        return activities
     }
 
     // MARK: - CRUD
@@ -258,53 +274,36 @@ class DatabaseManager {
 
     // MARK: Example Queries
 
+    // MARK: - Total time today
     func totalTimeToday() -> Int {
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: Date())
-        let startInterval = startOfDay.timeIntervalSince1970
-        let endInterval = startInterval + 86400
-
-        let sql = """
-        SELECT COALESCE(SUM(duration_minutes), 0) AS total
-        FROM activities
-        WHERE start_time >= \(startInterval)
-          AND start_time < \(endInterval);
-        """
-        let rows = query(sql: sql)
-        return rows.first?["total"] as? Int ?? 0
+        let activities = fetchTodayActivities()
+        return activities.reduce(0) { $0 + ($1.durationMinutes ?? 0) }
     }
 
+    // MARK: - Most time consuming activities today
     func mostTimeConsumingActivitiesToday(limit: Int = 5) -> [(Activity, Int)] {
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: Date())
-        let startInterval = startOfDay.timeIntervalSince1970
-        let endInterval = startInterval + 86400
+        let activities = fetchTodayActivities()
+        
+        // Sum durations per title
+        var totals: [String: Int] = [:]
+        var firstIds: [String: Int] = [:]
 
-        let sql = """
-            SELECT
-                MIN(id) AS first_id,
-                title,
-                SUM(duration_minutes) AS total_minutes
-            FROM activities
-            WHERE start_time >= \(startInterval)
-              AND start_time < \(endInterval)
-            GROUP BY title
-            ORDER BY total_minutes DESC
-            LIMIT \(limit);
-            """
+        for activity in activities {
+            totals[activity.title, default: 0] += activity.durationMinutes ?? 0
+            if firstIds[activity.title] == nil {
+                firstIds[activity.title] = activity.id
+            }
+        }
 
-        let rows = query(sql: sql)
+        let sorted = totals.sorted { $0.value > $1.value }
+            .prefix(limit)
 
-        return rows.compactMap { row in
-            guard let id = row["first_id"] as? Int,
-                  let total = row["total_minutes"] as? Int,
-                  let activity = readActivity(id: id)
-            else { return nil }
-
+        return sorted.compactMap { title, total in
+            guard let id = firstIds[title], let activity = readActivity(id: id) else { return nil }
             return (activity, total)
         }
     }
-    
+
     func topQuickStartActivities(limit: Int = 4) -> [String] {
         let sql = """
         SELECT
@@ -323,6 +322,48 @@ class DatabaseManager {
     }
 
 }
+
+extension DatabaseManager {
+    // Fetch the currently running activity (end_time = NULL)
+    func fetchCurrentActivity() -> Activity? {
+        let sql = """
+        SELECT id, title, start_time, end_time, duration_minutes
+        FROM activities
+        WHERE end_time IS NULL
+        LIMIT 1;
+        """
+        guard let row = query(sql: sql).first,
+              let id = row["id"] as? Int,
+              let title = row["title"] as? String,
+              let startRaw = row["start_time"] as? Double
+        else { return nil }
+
+        let start = Date(timeIntervalSince1970: startRaw)
+        return Activity(id: id, title: title, startTime: start, endTime: nil, durationMinutes: nil)
+    }
+
+    // Start a new activity and persist it immediately
+    func startActivity(title: String) -> Activity {
+        let start = Date()
+        let sql = """
+        INSERT INTO activities (title, start_time, end_time, duration_minutes)
+        VALUES ('\(title.replacingOccurrences(of: "'", with: "''"))', \(start.timeIntervalSince1970), NULL, NULL);
+        """
+        execute(sql: sql)
+
+        // Fetch the inserted activity
+        let id = Int(sqlite3_last_insert_rowid(db))
+        return Activity(id: id, title: title, startTime: start, endTime: nil, durationMinutes: nil)
+    }
+
+    // End an ongoing activity
+    func endActivity(_ activity: Activity) {
+        let end = Date()
+        let duration = Int(end.timeIntervalSince(activity.startTime) / 60)
+        updateActivity(id: activity.id, newEnd: end, newDuration: duration)
+    }
+}
+
 
 extension Date {
     func formattedDateString() -> String {

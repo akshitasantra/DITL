@@ -10,7 +10,6 @@ struct TimelineSection: View {
 
     @AppStorage("customThemeData") private var customThemeData: Data?
 
-
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
 
@@ -27,8 +26,9 @@ struct TimelineSection: View {
                 if let active = currentActivity {
                     TimelineEntryRow(
                         timeRange: formattedTimeRange(start: active.startTime, end: Date()),
-                        activity: active.title
+                        activity: active.title,
                     )
+                    .onTapGesture(count: 2) { onEdit(active) } // allow editing
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
                 }

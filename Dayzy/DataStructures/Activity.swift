@@ -2,8 +2,9 @@ import Foundation
 
 struct Activity: Identifiable {
     let id: Int            // SQLite row id
-    let title: String
-    let startTime: Date
-    let endTime: Date?
-    let durationMinutes: Int?
+    var title: String
+    var startTime: Date
+    var endTime: Date?
+    var durationMinutes: Int?
 }
+

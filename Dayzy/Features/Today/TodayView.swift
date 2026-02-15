@@ -147,19 +147,9 @@ struct TodayView: View {
     private func endCurrentActivity() {
         guard let activity = currentActivity else { return }
 
-        let end = Date()
-        let duration = Int(end.timeIntervalSince(activity.startTime) / 60)
-
-        DatabaseManager.shared.createActivity(
-            title: activity.title,
-            start: activity.startTime,
-            end: end,
-            duration: duration
-        )
+        DatabaseManager.shared.endActivity(activity)
 
         currentActivity = nil
-
-        // Reload timeline from DB
         timeline = DatabaseManager.shared.fetchTodayActivities()
     }
 
